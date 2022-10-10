@@ -16,13 +16,12 @@ DB_PASS = "admin"
 
 @app.route('/')
 def Index():
-    # TODO: tirar mock e comentarios - adicionar a consulta em s - adicionar mais row[x] no index.html
+    # TODO: tirar mock da linha 24 e comentarios - adicionar a consulta em s - adicionar mais row[x] no index.html
     # cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     # s = "SELECT * from usuarios"
     # cur.execute(s) # Execute the SQL
     # list_users = cur.fetchall()
-    list_users = [{'fname': 'nicolle', 'lname': 'nunes', 'email': 'n@n.com'},
-                  {'fname': 'nicolle', 'lname': 'nunes', 'email': 'n@n.com'}]
+    list_users = []
     return render_template('index.html', list_users=list_users)
 
 
