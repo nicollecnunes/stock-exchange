@@ -1,4 +1,4 @@
-co<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -15,24 +15,7 @@ co<!DOCTYPE html>
     </nav>
 
     <div class="container pt-4">{% block body %} {% endblock %}</div>
-    <div class="container pt-4">
-      <a href="/consulta1" class="btn btn-primary btn-sm mb-2">exibir lista de usuarios que (condicao consulta 1)</a>
-      <a href="/consulta2" class="btn btn-primary btn-sm mb-2">exibir lista de usuarios que (condicao consulta 2)</a>
-      <a href="/consulta3" class="btn btn-primary btn-sm mb-2">exibir lista de usuarios que (condicao consulta 3)</a>
-    </div>
     <script>
-      const btnDelete = document.querySelectorAll(".btn-delete");
-      if (btnDelete) {
-        const btnArray = Array.from(btnDelete);
-        btnArray.forEach((btn) => {
-          btn.addEventListener("click", (e) => {
-            if (!confirm("tem certeza que deseja deletar?")) {
-              e.preventDefault();
-            }
-          });
-        });
-      }
-
       $(document).ready(function () {
         $("#example").DataTable({
           aLengthMenu: [

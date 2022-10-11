@@ -16,24 +16,34 @@ DB_PASS = "admin"
 
 @app.route('/')
 def Index():
-    # TODO: tirar mock da linha 24 e comentarios - adicionar a consulta em s - adicionar mais row[x] no index.html
-    # cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    # s = "SELECT * from usuarios"
-    # cur.execute(s) # Execute the SQL
-    # list_users = cur.fetchall()
-    list_users = []
-    return render_template('index.html', list_users=list_users)
+    list_users = [[123, 'Nicolle', 'nicollecnunes', 'Diamantina'], [234, 'Nicolle',
+                                                                    'nicollecnunes', 'Diamantina'], [543, 'Nicolle', 'nicollecnunes', 'Diamantina']]
+    return render_template('index.html', list_users=list_users, list_ativos=[])
 
 
 @app.route('/delete/<string:id>', methods=['POST', 'GET'])
 def delete_user(id):
-    #TODO: tirar comentarios quando o banco tiver ok
     # cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     # cur.execute('DELETE FROM users WHERE id = {0}'.format(id))
     # conn.commit()
-    flash('usuario deletado com sucesso')
     return redirect(url_for('Index'))
+
+@app.route('/consultar-ativos/<string:id>', methods=['POST', 'GET'])
+def consultar_ativos(id):
+    # cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    # s = 'SELECT CodigoAtivo, Tipo FROM FundoInvestimentos WHERE CodigoUsuario = {0}'.format(id)
+    # s2 = 'SELECT Nome FROM Usuarios WHERE CodigoUsuario = {0}'.format(id)
+
+    # cur.execute(s)
+    # list_ativos = cur.fetchall()
+
+    # cur.execute(s2)
+    # nome_user = cur.fetch() 
+
+    nome_user = "Nicolle"
+    list_ativos = [[1, 'Tipo B'], [3, 'Tipotipo']]
+    return render_template('index.html', list_ativos=list_ativos, nome_user=nome_user)
 
 
 if __name__ == "__main__":
