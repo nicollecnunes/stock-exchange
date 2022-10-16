@@ -1,0 +1,13 @@
+version: "3"
+
+services:
+  banco:
+    image: postgres:latest
+    container_name: banco
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: admin
+      POSTGRES_USERNAME: postgres
+      POSTGRES_DB: sampledb
