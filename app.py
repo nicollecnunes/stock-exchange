@@ -12,7 +12,18 @@ DB_USER = "postgres"
 DB_PASS = "admin"
 
 conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+cur = conn.cursor()
 
+# with open('init.sql', 'r') as file:
+#     initSQL = file.read()
+
+# cur.execute(initSQL)
+# conn.commit()
+
+cur.execute('select * from usuario')
+recset = cur.fetchall()
+for rec in recset:
+    print(rec)
 
 @app.route('/')
 def Index():
