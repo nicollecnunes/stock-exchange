@@ -1,20 +1,23 @@
+<script>
+  let dataDe, dataAte;
+  function changeDataDe(e){
+    dataDe = (e.target.value);
+
+    var strLink = "consulta-por-data/" + dataDe + '/' + dataAte;
+    document.getElementById("consulta-por-data").setAttribute("href",strLink);
+  }
+
+  function changeDataAte(e){
+    dataAte = (e.target.value);
+    
+    var strLink = "consulta-por-data/" + dataDe + '/' + dataAte;
+    document.getElementById("consulta-por-data").setAttribute("href",strLink);
+  }
+</script>
+
 {% extends "layout.html" %}
 {% block body %}
-  <div class="row">
-    <div>
-      {% with messages = get_flashed_messages()  %}
-      {% if messages %}
-      {% for message in messages %}
-      <div class="alert alert-success alert-dismissible fade show" role="alert">
-        {{ message }}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-          <span aria-hidden="true">×</span>
-        </button>
-      </div>
-      {% endfor %}
-      {% endif %}
-      {% endwith %}
-    </div>
+  <div>
     {% if list_users %}
     <div>
       <h3>Usuarios</h3>
@@ -45,6 +48,18 @@
         </tbody>
       </table>
     </div>
+
+    <h3>Consulta por período</h3>
+  <div>
+    <input type="date" onchange="changeDataDe(event)">
+    <input type="date" onchange="changeDataAte(event)">
+    <a id="consulta-por-data" class="btn btn-primary btn-delete btn-sm">consultar investimentos nesse período</a>
+  </div>
+<br>
+  <h3>Relatório de analistas</h3>
+  <div>
+    <a href="/investimentos-por-analistas" class="btn btn-primary btn-delete btn-sm">consultar investimentos feitos por consultas de analistas</a>
+  </div>
     {% endif %}
 
     {% if list_ativos %}
@@ -68,7 +83,61 @@
       </table>
     </div>
     {% endif %}
+
+
+    {% if list_investimentos %}
+    <div>
+      <h3>Investimentos feitos de {{dataDe}} até {{dataAte}}</h3>
+      <table id="example" class="table table-striped table-bordered">
+        <thead>
+          <tr>
+            <td>Valor corrente</td>
+            <td>Quantidade</td>
+            <td>Data</td>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in list_investimentos %}
+          <tr>
+            <td>{{row[0]}}</td>
+            <td>{{row[1]}}</td>
+            <td>{{row[2]}}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+
+
+    {% if list_investimentos_analistas %}
+    <div>
+      <h3>Investimentos feitos com consulta de analistas</h3>
+      <table id="example" class="table table-striped table-bordered">
+        <thead>
+          <tr>
+            <td>Nome do analista</td>
+            <td>Valor corrente</td>
+            <td>Quantidade</td>
+            <td>Data</td>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in list_investimentos_analistas %}
+          <tr>
+            <td>{{row[0]}}</td>
+            <td>{{row[1]}}</td>
+            <td>{{row[2]}}</td>
+            <td>{{row[3]}}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+   
   </div>
+  
 </div>
   
 {% endblock %}

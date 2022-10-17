@@ -14,11 +14,11 @@ DB_PASS = "admin"
 conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
 cur = conn.cursor()
 
-# with open('init.sql', 'r') as file:
-#     initSQL = file.read()
+with open('init.sql', 'r') as file:
+    initSQL = file.read()
 
-# cur.execute(initSQL)
-# conn.commit()
+    cur.execute(initSQL)
+    conn.commit()
 
 cur.execute('select * from usuario')
 recset = cur.fetchall()
@@ -56,6 +56,28 @@ def consultar_ativos(id):
     list_ativos = [[1, 'Tipo B'], [3, 'Tipotipo']]
     return render_template('index.html', list_ativos=list_ativos, nome_user=nome_user)
 
+
+@app.route('/consulta-por-data/<de>/<ate>')
+def consulta_por_data(de=None, ate=None):
+     # cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    # s = 'SELECT ...'
+
+    # cur.execute(s)
+    # list_investimentos = cur.fetchall()
+
+    list_investimentos = [[550, 23, '02-02-2022'], [550, 23, '02-02-2022']]
+    return render_template('index.html', list_investimentos=list_investimentos, dataDe=de, dataAte=ate)
+
+@app.route('/investimentos-por-analistas')
+def investimentos_analistas():
+    # cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    # s = 'SELECT ...'
+
+    # cur.execute(s)
+    # list_investimentos_analistas = cur.fetchall()
+
+    list_investimentos_analistas = [['nome analista 1', 53350, 2, '02-02-2022' ], ['nome analista 2', 50, 23, '02-02-2022']]
+    return render_template('index.html', list_investimentos_analistas=list_investimentos_analistas)
 
 if __name__ == "__main__":
     app.run(debug=True)
