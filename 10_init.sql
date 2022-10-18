@@ -1,3 +1,5 @@
+SET datestyle = GERMAN, DMY;
+
 CREATE TABLE Usuario (
     codigo serial PRIMARY KEY,
     nome VARCHAR ( 50 ) NOT NULL,
@@ -16,6 +18,8 @@ CREATE TABLE Telefone_usuario (
     codigo_usuario INT NOT NULL,
     telefone VARCHAR ( 20 ) NOT NULL, -- Certo?
     CONSTRAINT FK_Usuario FOREIGN KEY (codigo_usuario) REFERENCES Usuario (codigo)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 );
  
 CREATE TABLE Pessoa_Fisica (
@@ -23,6 +27,8 @@ CREATE TABLE Pessoa_Fisica (
        sexo CHAR ( 1 ) NOT NULL,
     data_nascimento TIMESTAMP NOT NULL,
     CONSTRAINT FK_Usuario FOREIGN KEY (codigo_usuario) REFERENCES Usuario (codigo)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 );
 
 CREATE TABLE Pessoa_Juridica (
@@ -31,6 +37,8 @@ CREATE TABLE Pessoa_Juridica (
     data_abertura TIMESTAMP NOT NULL,
     situacao_cadastral VARCHAR ( 20 ) NOT NULL,
     CONSTRAINT FK_Usuario FOREIGN KEY (codigo_usuario) REFERENCES Usuario (codigo)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 );
 
 CREATE TABLE Bolsa_valores (
@@ -43,14 +51,16 @@ CREATE TABLE Classe_ativos (
     bolsa VARCHAR ( 10 ) NOT NULL,
     codigo VARCHAR ( 25 ) PRIMARY KEY,
     CONSTRAINT FK_Ativos FOREIGN KEY (bolsa) REFERENCES Bolsa_valores (abreviacao)
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT
 );
  
 CREATE TABLE Fundo_Investimentos (
     codigo_usuario INT UNIQUE NOT NULL,
-    codigo_ativo VARCHAR ( 25 ) NOT NULL,
     tipo VARCHAR ( 25 ) NOT NULL,
-    CONSTRAINT FK_Usuario FOREIGN KEY (codigo_usuario) REFERENCES usuario (codigo),
-    CONSTRAINT FK_Ativo FOREIGN KEY (codigo_ativo) REFERENCES classe_Ativos(codigo)
+    CONSTRAINT FK_Usuario FOREIGN KEY (codigo_usuario) REFERENCES usuario (codigo)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 );
  
 CREATE TABLE Analista (
@@ -72,6 +82,8 @@ CREATE TABLE Telefone_analista (
     nss_analista INT NOT NULL,
     telefone VARCHAR ( 20 ) NOT NULL, -- Certo?
     CONSTRAINT FK_Analista FOREIGN KEY (nss_analista) REFERENCES Analista (nss)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 );
  
  
@@ -81,6 +93,8 @@ CREATE TABLE Renda_Fixa(
     porcentagem NUMERIC (3, 2) NOT NULL,
     dia_rendimento INT NOT NULL CHECK (dia_rendimento BETWEEN 1 AND 31),
     CONSTRAINT FK_Renda_Fixa FOREIGN KEY (Codigo) REFERENCES Classe_ativos (codigo)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 );
 
 CREATE TABLE FII(
@@ -89,6 +103,8 @@ CREATE TABLE FII(
     dy NUMERIC (3, 2) NOT NULL,
     gestora VARCHAR ( 50 ) NOT NULL,
     CONSTRAINT FK_FII FOREIGN KEY (Codigo) REFERENCES Classe_ativos (codigo)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 );
 
 CREATE TABLE Acao(
@@ -97,6 +113,8 @@ CREATE TABLE Acao(
     tipo VARCHAR ( 10 ) NOT NULL,
     divida DECIMAL (12,1) NOT NULL,
     CONSTRAINT FK_ACAO FOREIGN KEY (Codigo) REFERENCES Classe_ativos (codigo)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 );
  
 CREATE TABLE Moeda(
@@ -108,6 +126,8 @@ CREATE TABLE Moedas_Pais(
     moeda VARCHAR ( 5 ) PRIMARY KEY,
     pais VARCHAR ( 50 ) NOT NULL,
     CONSTRAINT FK_MOEDA_PAIS FOREIGN KEY (Moeda) REFERENCES Moeda(abreviacao)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 );
  
 CREATE TABLE BDR(
@@ -115,16 +135,24 @@ CREATE TABLE BDR(
     empresa_estrangeira VARCHAR ( 50 ) NOT NULL,
     fracao DECIMAL (2,0) NOT NULL,
     moeda VARCHAR ( 5 ) NOT NULL,
-    CONSTRAINT FK_BDR_ACAO FOREIGN KEY (codigo) REFERENCES Acao(codigo),
+    CONSTRAINT FK_BDR_ACAO FOREIGN KEY (codigo) REFERENCES Acao(codigo)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
     CONSTRAINT FK_BDR_MOEDA FOREIGN KEY (moeda) REFERENCES Moeda(abreviacao)
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT
 );
  
 CREATE TABLE Consulta(
-    id_consulta INT NOT NULL PRIMARY KEY,
+    id_consulta serial NOT NULL PRIMARY KEY,
     codigo_usuario INT NOT NULL,
     nss_analista INT NOT NULL,
-    CONSTRAINT FK_CONSULTA_USUARIO FOREIGN KEY (codigo_usuario) REFERENCES Usuario(codigo),
+    CONSTRAINT FK_CONSULTA_USUARIO FOREIGN KEY (codigo_usuario) REFERENCES Usuario(codigo)
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT,
     CONSTRAINT FK_CONSULTA_ANALISTA FOREIGN KEY (nss_analista) REFERENCES Analista(nss)
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT
 );
  
 CREATE TABLE Investimento(
@@ -134,16 +162,24 @@ CREATE TABLE Investimento(
     quantidade INT NOT NULL,
     codigo_ativo VARCHAR ( 25 ) NOT NULL,
     PRIMARY KEY (codigo_usuario, data_compra),
-    CONSTRAINT FK_INVESTIMENTO_USUARIO FOREIGN KEY (codigo_usuario) REFERENCES Usuario(codigo),
+    CONSTRAINT FK_INVESTIMENTO_USUARIO FOREIGN KEY (codigo_usuario) REFERENCES Usuario(codigo)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
     CONSTRAINT FK_INVESTIMENTO_CLASSE_ATIVOS FOREIGN KEY (codigo_ativo) REFERENCES Classe_Ativos(codigo)
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT
 );
  
 CREATE TABLE Resulta_em(
     id_consulta INT NOT NULL,
     codigo_usuario INT NOT NULL,
     data_compra TIMESTAMP NOT NULL,
-    CONSTRAINT FK_RESULTA_EM_INVESTIMENTO FOREIGN KEY (codigo_usuario, data_compra) REFERENCES Investimento 	(codigo_usuario, data_compra),
+    CONSTRAINT FK_RESULTA_EM_INVESTIMENTO FOREIGN KEY (codigo_usuario, data_compra) REFERENCES Investimento (codigo_usuario, data_compra)
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT,
     CONSTRAINT FK_RESULTA_EM_CONSULTA FOREIGN KEY (id_consulta) REFERENCES Consulta (id_consulta)
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT
 );
 
 INSERT INTO usuario (nome, login, senha, logradouro, complemento, numero, bairro, cep, cidade, estado) VALUES ('Pedro Lucas', 'pedrold', '123teste', 'Artur Vitorino Coelho', 'APTO. 201', 181, 'Bauxita', 35400000, 'Ouro Preto', 'MG');
@@ -155,7 +191,7 @@ INSERT INTO usuario (nome, login, senha, logradouro, complemento, numero, bairro
 INSERT INTO pessoa_fisica (codigo_usuario, sexo, data_nascimento) VALUES (1, 'M', '01/03/1998');
 INSERT INTO pessoa_fisica (codigo_usuario, sexo, data_nascimento) VALUES (2, 'F', '12/09/1995');
 INSERT INTO pessoa_fisica (codigo_usuario, sexo, data_nascimento) VALUES (3, 'M', '05/11/2002');
--- INSERT INTO fundo_investimentos (codigo_usuario, tipo) VALUES (4, 'Fundo Multimercado');
+INSERT INTO fundo_investimentos (codigo_usuario, tipo) VALUES (4, 'Fundo Multimercado');
 INSERT INTO pessoa_juridica (codigo_usuario, cnae, data_abertura, situacao_cadastral) VALUES (5, 6201501, '01/10/2005', 'Ativo');
 
 INSERT INTO telefone_usuario (codigo_usuario, telefone) VALUES (1, '(31) 9 6885-9119');
@@ -206,3 +242,26 @@ INSERT INTO classe_ativos (bolsa, codigo) VALUES ('B3', 'Tesouro Direto');
 INSERT INTO renda_fixa (codigo, grupo, porcentagem, dia_rendimento) VALUES ('Tesouro Direto', 'B3', 0.014, 15);
 INSERT INTO classe_ativos (bolsa, codigo) VALUES ('B3', 'CDB');
 INSERT INTO renda_fixa (codigo, grupo, porcentagem, dia_rendimento) VALUES ('CDB', 'B3', 0.03, 1);
+
+INSERT INTO consulta (codigo_usuario, nss_analista) VALUES (1, 1);
+INSERT INTO consulta (codigo_usuario, nss_analista) VALUES (2, 2);
+INSERT INTO consulta (codigo_usuario, nss_analista) VALUES (3, 3);
+INSERT INTO consulta (codigo_usuario, nss_analista) VALUES (4, 2);
+INSERT INTO consulta (codigo_usuario, nss_analista) VALUES (5, 1);
+
+INSERT INTO investimento (codigo_usuario, data_compra, valor_corrente, quantidade, codigo_ativo) VALUES (1, '16-10-2022 12:25:20-07', 100.00, 2, 'ENGI11');
+INSERT INTO investimento (codigo_usuario, data_compra, valor_corrente, quantidade, codigo_ativo) VALUES (1, '16-10-2022 13:40:10-07', 550.60, 1, 'ENGI13');
+INSERT INTO investimento (codigo_usuario, data_compra, valor_corrente, quantidade, codigo_ativo) VALUES (2, '01-07-2022 19:26:14-07', 2000.00, 4, 'MGLU3');
+INSERT INTO investimento (codigo_usuario, data_compra, valor_corrente, quantidade, codigo_ativo) VALUES (2, '12-10-2022 11:52:56-07', 600.00, 1, 'ABCP11');
+INSERT INTO investimento (codigo_usuario, data_compra, valor_corrente, quantidade, codigo_ativo) VALUES (3, '09-01-2021 21:50:40-07', 20.00, 2, 'ITUB4');
+INSERT INTO investimento (codigo_usuario, data_compra, valor_corrente, quantidade, codigo_ativo) VALUES (3, '10-09-2020 00:30:00-07', 3500.00, 1, 'ALZR11');
+INSERT INTO investimento (codigo_usuario, data_compra, valor_corrente, quantidade, codigo_ativo) VALUES (4, '12-12-2022 12:36:01-07', 220.00, 5, 'Tesouro Direto');
+INSERT INTO investimento (codigo_usuario, data_compra, valor_corrente, quantidade, codigo_ativo) VALUES (4, '27-06-2019 08:00:56-07', 2700.00, 1, 'AAPL34');
+INSERT INTO investimento (codigo_usuario, data_compra, valor_corrente, quantidade, codigo_ativo) VALUES (5, '21-02-2022 10:25:25-07', 230.50, 1, 'AFHI11');
+INSERT INTO investimento (codigo_usuario, data_compra, valor_corrente, quantidade, codigo_ativo) VALUES (5, '09-10-2021 14:22:10-07', 5900.50, 1,'CDB');
+
+INSERT INTO resulta_em (id_consulta, codigo_usuario, data_compra) VALUES (1, 1, '16-10-2022 13:40:10-07');
+INSERT INTO resulta_em (id_consulta, codigo_usuario, data_compra) VALUES (2, 2, '01-07-2022 19:26:14-07');
+INSERT INTO resulta_em (id_consulta, codigo_usuario, data_compra) VALUES (3, 3, '09-01-2021 21:50:40-07');
+INSERT INTO resulta_em (id_consulta, codigo_usuario, data_compra) VALUES (4, 4, '12-12-2022 12:36:01-07');
+INSERT INTO resulta_em (id_consulta, codigo_usuario, data_compra) VALUES (5, 5, '09-10-2021 14:22:10-07');

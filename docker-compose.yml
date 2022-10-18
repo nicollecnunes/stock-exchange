@@ -12,4 +12,5 @@ services:
       POSTGRES_USERNAME: postgres
       POSTGRES_DB: sampledb
     volumes:
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./10_init.sql:/docker-entrypoint-initdb.d/10_init.sql
+      - ./20_view_carteira.sql:/docker-entrypoint-initdb.d/20_view_carteira.sql
