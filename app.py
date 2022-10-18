@@ -3,6 +3,8 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 import psycopg2  # pip install psycopg2
 import psycopg2.extras
 import numpy as np
+import re
+from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = "bcc321-bd"
@@ -35,8 +37,10 @@ def Index():
 def delete_user(id):
     # cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-    # cur.execute('DELETE FROM usuario WHERE codigo = {0}'.format(id))
-    # conn.commit()
+    cur.execute (f"DELETE FROM resulta_em WHERE codigo_usuario = {id}")
+    cur.execute (f"DELETE FROM consulta WHERE codigo_usuario = {id}")
+    cur.execute (f"DELETE FROM usuario WHERE codigo = {id}")
+    conn.commit()
 
     return redirect(url_for('Index'))
 
@@ -62,24 +66,27 @@ def consultar_ativos(id):
 
 @app.route('/consulta-por-data/<de>/<ate>')
 def consulta_por_data(de=None, ate=None):
-     # cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    # s = 'SELECT ...'
+    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    # s = 'SELECT * FROM tabela WHERE {0} BETWEEN data1 AND {1}'
 
-    # cur.execute(s)
-    # list_investimentos = cur.fetchall()
+    # novoDe = datetime.strptime(de, "%Y-%m-%d").strftime('%d-%m-%Y')
+    # novoAte = datetime.strptime(ate, "%Y-%m-%d").strftime('%d-%m-%Y')
 
-    list_investimentos = [[550, 23, '02-02-2022'], [550, 23, '02-02-2022']]
+    cur.execute(f"SELECT * FROM investimento WHERE data_compra BETWEEN '{de} 00:00:00'::timestamp AND '{ate} 00:00:00'::timestamp")
+    list_investimentos = cur.fetchall()
+
+    # list_investimentos = [[550, 23, '02-02-2022'], [550, 23, '02-02-2022']]
     return render_template('index.html', list_investimentos=list_investimentos, dataDe=de, dataAte=ate)
 
 @app.route('/investimentos-por-analistas')
 def investimentos_analistas():
     # cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    # s = 'SELECT ...'
+    # s = 'SELECT * from'
 
-    # cur.execute(s)
-    # list_investimentos_analistas = cur.fetchall()
+    cur.execute("SELECT i.codigo_usuario, c.nss_analista, a.nome, i.data_compra, i.valor_corrente, i.quantidade, i.codigo_ativo FROM investimento AS i, resulta_em AS r, consulta AS c, analista AS a WHERE i.codigo_usuario = r.codigo_usuario AND i.data_compra = r.data_compra AND i.codigo_usuario = c.codigo_usuario AND a.nss = c.nss_analista")
+    list_investimentos_analistas = cur.fetchall()
 
-    list_investimentos_analistas = [['nome analista 1', 53350, 2, '02-02-2022' ], ['nome analista 2', 50, 23, '02-02-2022']]
+    # list_investimentos_analistas = [['nome analista 1', 53350, 2, '02-02-2022' ], ['nome analista 2', 50, 23, '02-02-2022']]
     return render_template('index.html', list_investimentos_analistas=list_investimentos_analistas)
 
 @app.route('/', methods=['POST'])
@@ -88,15 +95,24 @@ def consulta_personalizada():
     # cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     # s = consulta
 
-    # cur.execute(s)
-    # resultado_consulta = cur.fetchall()
+    cur.execute(consulta)
+    resultado_consulta = cur.fetchall()
+    
+    column = re.findall("SELECT\s*(.+?(?=FROM))", request.form['text'])
+    search_column = ''.join(column)
+
+    matches = re.findall("[^,\s][^\,]*[^,\s]*", search_column)
+    lista_categorias = matches
+
+    # cur.execute(f"SELECT column_name FROM information_schema.columns WHERE table_name = '{search_column}';")
+    # lista_categorias = (''.join(x) for x in np.asarray(cur.fetchall()))
 
     #esse lista categorias seria o cabeçalho da tabela, pq dependendo da consulta retorna coisa diferente
     #n sei como pegar isso, se for dificil deixa vazio mesmo
 
-    lista_categorias = ['nome', 'numero', 'outro numero', 'texto', 'data']
-    resultado_consulta = [['resul.tado', 53350, 2, 'aaaa',
-                           '02-02-2022'], ['resul.tado', 53350, 2, 'aaaa', '02-02-2022'], ]
+    # lista_categorkias = []
+    # resultado_consulta = [['resul.tado', 53350, 2, 'aaaa',
+    #                        '02-02-2022'], ['resul.tado', 53350, 2, 'aaaa', '02-02-2022'], ]
     return render_template('index.html', resultado_consulta=resultado_consulta, lista_categorias=lista_categorias)
 
 # cur.execute('SELECT * FROM carteira_investimentos')
