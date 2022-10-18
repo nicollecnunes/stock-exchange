@@ -82,6 +82,22 @@ def investimentos_analistas():
     list_investimentos_analistas = [['nome analista 1', 53350, 2, '02-02-2022' ], ['nome analista 2', 50, 23, '02-02-2022']]
     return render_template('index.html', list_investimentos_analistas=list_investimentos_analistas)
 
+@app.route('/', methods=['POST'])
+def consulta_personalizada():
+    consulta = request.form['text']
+    # cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    # s = consulta
+
+    # cur.execute(s)
+    # resultado_consulta = cur.fetchall()
+
+    #esse lista categorias seria o cabeçalho da tabela, pq dependendo da consulta retorna coisa diferente
+    #n sei como pegar isso, se for dificil deixa vazio mesmo
+
+    lista_categorias = ['nome', 'numero', 'outro numero', 'texto', 'data']
+    resultado_consulta = [['resul.tado', 53350, 2, 'aaaa',
+                           '02-02-2022'], ['resul.tado', 53350, 2, 'aaaa', '02-02-2022'], ]
+    return render_template('index.html', resultado_consulta=resultado_consulta, lista_categorias=lista_categorias)
 
 # cur.execute('SELECT * FROM carteira_investimentos')
 # recset = cur.fetchall()
